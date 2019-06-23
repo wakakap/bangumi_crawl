@@ -7,7 +7,7 @@ import time
 csv_file = open("animelist.csv","w",newline='',encoding="utf-8")
 writer = csv.writer(csv_file)
 writer.writerow(['CHN_NAME','ORI_NAME','RELEASE_TIME','MY_TAG','LINK','MY_STAR','MY_COMMENT'])
-page=19
+page=1
 while 1:
     print("page is "+str(page))
     URL = 'http://bangumi.tv/anime/list/wakakap/collect?page='+str(page)
