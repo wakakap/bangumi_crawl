@@ -3,23 +3,41 @@ from selenium import webdriver
 import csv
 import requests  
 import time
-csv_file = open("myanimelist.csv","w",newline='',encoding="utf-8")
+csv_file = open("myanimelist3.csv","w",newline='',encoding="utf-8")
 writer = csv.writer(csv_file)
-writer.writerow(['CHN_NAME','ORI_NAME','RELEASE_TIME','MY_TAG','LINK','MY_STAR','MY_COMMENT'])
+writer.writerow(['CHN_NAME','ORI_NAME','INFO','MY_TAG','LINK','MY_STAR','MY_COMMENT'])
 page=1
 #f12->network->doc->点击name下的名称->cookies抄写于此
-cookie={'domain':'.bangumi.tv',
-        'name':'',
-        'value':'',
+#目前还没有理解透彻cookie
+#试错法得到：优先写浏览器查看的response cookie，如没有写request cookie的后三个。
+cookie1={'domain':'.bangumi.tv',
+        'name':'chii_sid',
+        'value':'99nNVF',
         'path':'/'}
+#cookie2={'domain':'.bangumi.tv',
+#        'name':'chii_sid',
+#        'value':'MM3iZ3',
+#        'path':'/'}
+#cookie3={'domain':'.bangumi.tv',
+#        'name':'chii_auth',
+#        'value':'DZxzXp1FRUdfbyQuKmlaBXlwocg8TZsa9SaZRtG1kEfweie6cL33sInia9Ld1odjwRqN3RRQOvZhydoY47',
+#        'path':'/'}
+#cookie4={'domain':'.bangumi.tv',
+#        'name':'chii_cookietime',
+#        'value':'0',
+#        'path':'/'}
+sum=0
+ersum=0
 while 1:
-    print("page is "+str(page))
+    #print("page is "+str(page))
     URL = 'http://bangumi.tv/anime/list/wakakap/collect?page='+str(page)
     driver = webdriver.PhantomJS(executable_path='C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python36_64\Scripts\phantomjs.exe')
     driver.get(URL)
     ##使用cookie部分###############################
     driver.delete_all_cookies()
-    driver.add_cookie(cookie)
+    driver.add_cookie(cookie1)
+    #driver.add_cookie(cookie2)
+    #driver.add_cookie(cookie3)
     driver.get(URL)#注意用这种方法时要二次get
     ###############################################
     #driver.switch_to.frame("")这个html没有使用frame所以不需要跳转
@@ -30,11 +48,11 @@ while 1:
     #######注意class有空格时写一边就够了####
     #driver.find_element_by_css_selector(‘tag_name.class_value’)这种方法可行，甚至当tag_name唯一时可省略.class_value
     data = driver.find_element_by_id("browserItemList")
-    i=1
     try: 
         data.find_element_by_xpath('/html/body/div/div/div/div/ul/li[1]/div')
     except Exception:
         break
+    i=1
     while 1:
         try:
             item = data.find_element_by_xpath('/html/body/div/div/div/div/ul/li['+str(i)+']/div')
@@ -76,34 +94,42 @@ while 1:
             startext=0
             print("error")
         #str.find(str, beg=0, end=len(string))
+        #inform
         try:
             inform = item.find_element_by_css_selector("p.info").text
         except Exception:
-            inform = "标签: NONE"
-        ttag = item.find_element_by_css_selector("p.collectInfo").text
+            inform = "NONE"
+        #tag
+        try:
+            ttag = item.find_element_by_css_selector("p.collectInfo").text
+        except Exception:
+            ttag = '标签: NONE'
+        #mycom
         try:
             mycom = item.find_element_by_css_selector("div.text").text
         except Exception:
             mycom = 'NONE'
-        a1=inform.find('/')
-        a2=inform.find('/',a1+1)
-        rel_time=inform[a1+2:a2-1]
+        #a1=inform.find('/')
+        #a2=inform.find('/',a1+1)
+        #rel_time=inform[a1+2:a2-1]
         b1=ttag.find('标签:')
         tag=ttag[b1+4:]
-		print("i is "+str(i))
+        sum=sum+1
+        print("page;i;sum is "+str(page)+' '+str(i)+' '+str(sum))
         print(ori_name)
-        print(chn_name)
-        print(rel_time)
-        print(link)
-        print(tag)
-        print(mycom)
-        print(startext)
-        #write
+        #print(chn_name)
+        #print(inform)
+        #print(link)
+        #print(tag)
+        #print(mycom)
+        #print(startext)
         try:
-            row = [chn_name,ori_name,rel_time,tag,link,startext,mycom]
+            row = [chn_name,ori_name,inform,tag,link,startext,mycom]
             writer.writerow(row)
         except Exception:
-            print('error!!!!!!!!!!!')
+            ersum=ersum+1
+            row = ['error','page is '+str(page),'i is '+str(i),'sum is '+str(sum),'','','']
+            writer.writerow(row)
         i=i+1
     page=page+1
 csv_file.close()
