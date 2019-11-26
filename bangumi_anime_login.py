@@ -1,45 +1,58 @@
 #爬取某用户看过的动画的信息存为csv文件
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import csv
 import requests  
 import time
-csv_file = open("myanimelist3.csv","w",newline='',encoding="utf-8")
+csv_file = open("myanimelist.csv","w",newline='',encoding="utf-8")
 writer = csv.writer(csv_file)
 writer.writerow(['CHN_NAME','ORI_NAME','INFO','MY_TAG','LINK','MY_STAR','MY_COMMENT'])
-page=1
 #f12->network->doc->点击name下的名称->cookies抄写于此
 #目前还没有理解透彻cookie
 #试错法得到：优先写浏览器查看的response cookie，如没有写request cookie的后三个。
 cookie1={'domain':'.bangumi.tv',
         'name':'chii_sid',
-        'value':'99nNVF',
+        'value':'zMSwDd',
         'path':'/'}
-#cookie2={'domain':'.bangumi.tv',
-#        'name':'chii_sid',
-#        'value':'MM3iZ3',
-#        'path':'/'}
-#cookie3={'domain':'.bangumi.tv',
-#        'name':'chii_auth',
-#        'value':'DZxzXp1FRUdfbyQuKmlaBXlwocg8TZsa9SaZRtG1kEfweie6cL33sInia9Ld1odjwRqN3RRQOvZhydoY47',
-#        'path':'/'}
-#cookie4={'domain':'.bangumi.tv',
-#        'name':'chii_cookietime',
-#        'value':'0',
-#        'path':'/'}
+cookie2={'domain':'.bangumi.tv',
+        'name':'chii_theme',
+        'value':'light',
+        'path':'/'}
+cookie3={'domain':'.bangumi.tv',
+        'name':'chii_auth',
+        'value':'Z16qEam2WhNzf7XGW1i%2BmOzFLgAnH0qgzlVal4A7oe3UNEj4%2BtpmbEeZZg%2B2elBC7X3elwGf9ps2KabeAvxhVmBHQihUeQMoxAR9	',
+        'path':'/'}
+cookie4={'domain':'.bangumi.tv',
+        'name':'chii_cookietime',
+        'value':'2592000',
+        'path':'/'}
+page=1
 sum=0
 ersum=0
+URL = 'https://bangumi.tv/anime/list/wakakap/collect?page='+str(page)
+#driver = webdriver.PhantomJS(executable_path='C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python37_64\Scripts\phantomjs.exe')
+#chrome_options = Options()
+#chrome_options.add_argument('--headless')#无头模式
+#driver = webdriver.Chrome(chrome_options=chrome_options)
+driver = webdriver.Chrome()
+driver.get(URL)
+########手动登录######
+time.sleep(40)#
+# 获取cookies
+cookie_list = driver.get_cookies()
+driver.get(URL)
+##使用cookie部分###############################
+#driver.delete_all_cookies()
+#driver.add_cookie(cookie1)
+#driver.add_cookie(cookie2)
+#driver.add_cookie(cookie3)
+#driver.add_cookie(cookie4)
+#driver.get(URL)#注意用这种方法时要二次get
+###############################################
 while 1:
-    #print("page is "+str(page))
-    URL = 'http://bangumi.tv/anime/list/wakakap/collect?page='+str(page)
-    driver = webdriver.PhantomJS(executable_path='C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python36_64\Scripts\phantomjs.exe')
+    print("page is "+str(page))
+    URL = 'https://bangumi.tv/anime/list/wakakap/collect?page='+str(page)
     driver.get(URL)
-    ##使用cookie部分###############################
-    driver.delete_all_cookies()
-    driver.add_cookie(cookie1)
-    #driver.add_cookie(cookie2)
-    #driver.add_cookie(cookie3)
-    driver.get(URL)#注意用这种方法时要二次get
-    ###############################################
     #driver.switch_to.frame("")这个html没有使用frame所以不需要跳转
     #我尝试了搜索classname定位，总是报错，估计这种方法有些问题。
     #改用绝对路径方法。
@@ -67,32 +80,32 @@ while 1:
             ori_name = t_name
             chn_name = 'NONE'
         try:
-            sstar = item.find_element_by_css_selector("span.starsinfo")
+            sstar = item.find_element_by_css_selector("span.starlight")
             star = sstar.get_attribute('class')
             startext=0
-            if star=='sstars1 starsinfo':
+            if star=='starlight stars1':
                 startext=1
-            elif star=='sstars2 starsinfo':
+            elif star=='starlight stars2':
                 startext=2
-            elif star=='sstars3 starsinfo':
+            elif star=='starlight stars3':
                 startext=3
-            elif star=='sstars4 starsinfo':
+            elif star=='starlight stars4':
                 startext=4
-            elif star=='sstars5 starsinfo':
+            elif star=='starlight stars5':
                 startext=5
-            elif star=='sstars6 starsinfo':
+            elif star=='starlight stars6':
                 startext=6
-            elif star=='sstars7 starsinfo':
+            elif star=='starlight stars7':
                 startext=7
-            elif star=='sstars8 starsinfo':
+            elif star=='starlight stars8':
                 startext=8
-            elif star=='sstars9 starsinfo':
+            elif star=='starlight stars9':
                 startext=9
-            elif star=='sstars10 starsinfo':
+            elif star=='starlight stars10':
                 startext=10
         except Exception:
-            startext=0
-            print("error")
+            startext=-1
+            print('start error '+str(startext))
         #str.find(str, beg=0, end=len(string))
         #inform
         try:
