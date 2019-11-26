@@ -1,4 +1,4 @@
-#爬取某用户看过的动画的信息存为csv文件
+#爬取某用户看过的动画/游戏的列表信息存为csv文件
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import csv
@@ -29,7 +29,8 @@ cookie4={'domain':'.bangumi.tv',
 page=1
 sum=0
 ersum=0
-URL = 'https://bangumi.tv/anime/list/wakakap/collect?page='+str(page)
+# https://bangumi.tv/anime/list/wakakap/collect?page=
+URL = 'https://bangumi.tv/game/list/wakakap/collect?page='+str(page)
 #driver = webdriver.PhantomJS(executable_path='C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python37_64\Scripts\phantomjs.exe')
 #chrome_options = Options()
 #chrome_options.add_argument('--headless')#无头模式
@@ -51,7 +52,7 @@ driver.get(URL)
 ###############################################
 while 1:
     print("page is "+str(page))
-    URL = 'https://bangumi.tv/anime/list/wakakap/collect?page='+str(page)
+    URL = 'https://bangumi.tv/game/list/wakakap/collect?page='+str(page)
     driver.get(URL)
     #driver.switch_to.frame("")这个html没有使用frame所以不需要跳转
     #我尝试了搜索classname定位，总是报错，估计这种方法有些问题。
