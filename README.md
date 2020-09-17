@@ -9,4 +9,4 @@ selenium.webdriver+PhantomJS+cookie的方法。
 
 2019.11.26 定位更新。添加手动登录，废除PhantomJS，改用chromedriver。
 
-
+2020.09.18 又备份了一下顺手修了下代码，没时间学python了55
